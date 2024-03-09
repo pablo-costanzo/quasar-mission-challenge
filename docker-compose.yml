@@ -1,0 +1,39 @@
+version: '3.7'
+services:
+  quasar-mission-challenge:
+    container_name: quasar-mission-challenge
+    image: costanzopa/quasar-mission-challenge
+    build:
+      context: .
+      dockerfile: src/main/docker/local/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/build/src
+      - $HOME/.m2/repository:/root/.m2/repository
+    privileged: true
+    networks:
+      - quasar-mission-challenge-network
+    depends_on:
+      - quasar-mission-challenge-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://quasar-mission-challenge-db:5432/quasar_mission_challenge_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+  quasar-mission-challenge-db:
+    restart: always
+    image: postgres
+    ports:
+      - "5432:5432"
+    container_name: quasar-mission-challenge-db
+    networks:
+      - quasar-mission-challenge-network
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=quasar_mission_challenge_db
+
+networks:
+  quasar-mission-challenge-network:
